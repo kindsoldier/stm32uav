@@ -76,7 +76,7 @@ typedef struct {
 } task_t;
 
 
-#define TASK_COUNT_REG  9
+#define TASK_COUNT_REG  8
 
 typedef struct __attribute__((packed)) {
     struct {
@@ -164,20 +164,20 @@ void __attribute__((naked)) pend_sv_handler(void) {
         uint32_t psp;
         __asm__(
             "mrs %0, psp\n"
-            "stmdb %0!, {r2,r4-r11}\n"
+            "stmdb %0!, {r4-r11}\n"
             "msr psp, %0\n" : "=r"(psp)
         );
         g_scheduler.tasks[g_scheduler.current_task].sp = psp;
     } else {
         __asm__(
-           "stmdb sp!, {r2,r4-r11}\n");
+           "stmdb sp!, {r4-r11}\n");
     }
 
     scheduler_switch(&g_scheduler);
 
     uint32_t psp = (uint32_t)g_scheduler.tasks[g_scheduler.current_task].sp;
     __asm__(
-            "ldmfd %0!, {r2,r4-r11}\n"
+            "ldmfd %0!, {r4-r11}\n"
             "msr psp, %0\n"::"r"(psp)
     );
 
