@@ -1,9 +1,9 @@
 
-# Minimal STM32 F4 task sheduler
+## Minimal STM32 F4/F7 task sheduler
 
 NanoOS: "Make less makes no sense" =)
 
-## Register frame description
+### Register frame description
 
 ```
 /*
