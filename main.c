@@ -85,7 +85,7 @@ void task4(void) {
     static volatile int32_t t4;
 
     while (true) {
-        sem_post32(&t4, (int32_t)1);
+        atom_inc32(&t4, (int32_t)1);
         printf("task 4 %d %lu\r\n", g_uptime, t4);
         delay(3300);
     };

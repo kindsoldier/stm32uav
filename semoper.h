@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-int32_t sem_post32(volatile int32_t *addr, int32_t value);
-int32_t sem_wait32(volatile int32_t *addr, int32_t value);
+int32_t atom_inc32(volatile int32_t *addr, int32_t value);
+int32_t atom_dec32(volatile int32_t *addr, int32_t value);
 
 #endif

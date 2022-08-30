@@ -3,10 +3,10 @@
 
 .text
 
-.globl  sem_post32
-.type   sem_post32, %function
+.globl  atom_inc32
+.type   atom_inc32, %function
 
-sem_post32:
+atom_inc32:
 1:
         ldrex           r2, [r0]
         add             r2, r2, r1
@@ -17,10 +17,10 @@ sem_post32:
         bx              lr
 
 
-.globl  sem_wait32
-.type   sem_wait32, %function
+.globl  atom_dec32
+.type   atom_dec32, %function
 
-sem_wait32:
+atom_dec32:
 1:
         ldrex           r2, [r0]
         sub             r2, r2, r1
