@@ -31,6 +31,8 @@ all: main.bin
 OBJS+= main.o
 OBJS+= syscall.o
 OBJS+= usartu.o
+OBJS+= scheduler.o
+
 
 main.elf: $(OBJS)
 	$(TARGET)-gcc $(^F) $(LDFLAGS) -o $@
