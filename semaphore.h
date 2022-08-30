@@ -3,10 +3,12 @@
  */
 
 
+#include <stdint.h>
+
 typedef struct {
-    int value;
+    int32_t value;
 } sem_t;
 
-int sem_init(sem_t* sem, int value);
-int sem_wait(sem_t* sem);
-int sem_post(sem_t* sem);
+void sem_init(sem_t* sem, int32_t value);
+int32_t sem_wait(sem_t* sem);
+int32_t sem_post(sem_t* sem);

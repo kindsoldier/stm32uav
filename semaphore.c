@@ -3,21 +3,19 @@
  */
 
 #include "semaphore.h"
+#include "semoper.h"
 
-typedef struct {
-    int value;
-} sem_t;
-
-int sem_init(sem_t* sem, int value) {
+void sem_init(sem_t* sem, int32_t value) {
     sem->value = value;
 }
 
-int sem_wait(sem_t* sem) {
-    while(sem->value > 0);
-    sem->value--;
+int32_t sem_wait(sem_t* sem) {
+    //while(sem->value > 0);
+    //sem->value--;
+    return sem_wait32(&(sem->value), (int32_t)1);
 }
 
-
-int sem_post(sem_t* sem) {
-    sem->value++;
+int32_t sem_post(sem_t* sem) {
+    //sem->value++;
+    return sem_post32(&(sem->value), (int32_t)1);
 }

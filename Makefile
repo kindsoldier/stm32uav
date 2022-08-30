@@ -14,6 +14,7 @@ CFLAGS+= -fno-common -ffunction-sections -fdata-sections
 CFLAGS+= -g -gdwarf-2
 CFLAGS+= -Wall
 
+
 LDFLAGS+= ${CFLAGS}
 LDFLAGS+= --static
 #LDFLAGS+= -nostartfiles
@@ -32,7 +33,8 @@ OBJS+= main.o
 OBJS+= syscall.o
 OBJS+= usartu.o
 OBJS+= scheduler.o
-
+OBJS+= semoper.o
+OBJS+= semaphore.o
 
 main.elf: $(OBJS)
 	$(TARGET)-gcc $(^F) $(LDFLAGS) -o $@
@@ -42,7 +44,7 @@ main.elf: $(OBJS)
 	$(TARGET)-gcc $(CFLAGS) -c -o $@ $<
 
 %.o: %.S
-	$(TARGET)-as $(ASFLAGS) -o $@ $<
+	$(TARGET)-gcc $(CFLAGS) -c -o $@ $<
 
 %.bin: %.elf
 	$(TARGET)-objcopy -O binary $< $@
