@@ -1,7 +1,7 @@
 
 # Minimal STM32 F4 task sheduler
 
-NanoOS: "It is impossible to do less" =)
+NanoOS: "Make less makes no sense" =)
 
 ## Register frame description
 
