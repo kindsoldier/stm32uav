@@ -35,6 +35,8 @@ OBJS+= usartu.o
 OBJS+= scheduler.o
 OBJS+= atomic.o
 OBJS+= semaphore.o
+OBJS+= mutex.o
+
 
 main.elf: $(OBJS)
 	$(TARGET)-gcc $(^F) $(LDFLAGS) -o $@

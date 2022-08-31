@@ -92,7 +92,7 @@ void task3(void) {
 void task4(void) {
     static volatile int32_t t4;
     while (true) {
-        atom_inc32(&t4, (int32_t)1);
+        atomic_inc32(&t4, (int32_t)1);
         sem_wait(&g_sem);
         printf("task 4 %d %lu\r\n", g_uptime, t4);
         sem_post(&g_sem);
