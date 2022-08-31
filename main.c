@@ -19,6 +19,7 @@
 #include "scheduler.h"
 #include "usartu.h"
 #include "semoper.h"
+#include "semaphore.h"
 
 
 void delay(uint32_t n) {
@@ -59,35 +60,43 @@ static void systick_setup(void) {
 }
 
 int g_uptime;
+sem_t g_sem;
 
 void task1(void) {
     while (true) {
+        sem_wait(&g_sem);
         printf("task 1 %d\r\n", g_uptime);
+        sem_post(&g_sem);
         delay(3000);
     };
 }
 
 void task2(void) {
     while (true) {
+        sem_wait(&g_sem);
         printf("task 2 %d\r\n", g_uptime);
-        delay(3100);
+        sem_post(&g_sem);
+        delay(3000);
     };
 }
 
 void task3(void) {
     while (true) {
+        sem_wait(&g_sem);
         printf("task 3 %d\r\n", g_uptime);
-        delay(3200);
+        sem_post(&g_sem);
+        delay(3000);
     };
 }
 
 void task4(void) {
     static volatile int32_t t4;
-
     while (true) {
         atom_inc32(&t4, (int32_t)1);
+        sem_wait(&g_sem);
         printf("task 4 %d %lu\r\n", g_uptime, t4);
-        delay(3300);
+        sem_post(&g_sem);
+        delay(3000);
     };
 }
 
@@ -99,7 +108,7 @@ void sys_tick_handler(void) {
 
 int main(void) {
     g_uptime = 0;
-
+    sem_init(&g_sem, 1);
     static scheduler_t g_scheduler;
 
     clock_setup();

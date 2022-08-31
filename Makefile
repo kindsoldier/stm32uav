@@ -4,7 +4,7 @@
 
 .SECONDARY:
 
-CFLAGS+= -I. -Os  -DSTM32F4 -std=c99
+CFLAGS+= -I. -O1  -DSTM32F4 -std=c99
 #CFLAGS+= -mthumb
 #CFLAGS+= -march=armv7e-m
 CFLAGS+= -mfloat-abi=hard

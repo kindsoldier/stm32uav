@@ -83,42 +83,47 @@ static void scheduler_switch(scheduler_t *scheduler) {
 void __attribute__((naked)) pend_sv_handler(void) {
 
     const uint32_t RETURN_ON_PSP = RETURN_ON_PSP_THREAD;
-
-    __asm__("cpsid if":::"memory");
     uint32_t lr;
-    __asm__("mov %0, lr\n":"=r"(lr));
+
+    __asm__(
+            "cpsid  if      \n"
+            "mov    %0, lr  \n"
+            :"=r"(lr)
+    );
 
     if (lr & EXC_RETURN_MODE_THREAD) {
         uint32_t psp;
         __asm__(
-            "mrs %0, psp\n"
-            "stmdb %0!, {r4-r11}\n"
-            "msr psp, %0\n" : "=r"(psp)
+            "mrs    %0, psp       \n"
+            "stmdb  %0!, {r4-r11} \n"
+            "msr    psp, %0       \n"
+            : "=r"(psp)
         );
         m_scheduler->tasks[m_scheduler->current_task].sp = psp;
     } else {
         __asm__(
-           "stmdb sp!, {r4-r11}\n");
+           "stmdb   sp!, {r4-r11} \n"
+        );
     }
 
     scheduler_switch(m_scheduler);
 
     uint32_t psp = (uint32_t)m_scheduler->tasks[m_scheduler->current_task].sp;
-    __asm__(
-            "ldmfd %0!, {r4-r11}\n"
-            "msr psp, %0\n"::"r"(psp)
+    __asm__ (
+            "ldmfd  %0!, {r4-r11} \n"
+            "msr    psp, %0       \n"
+            "cpsie  if            \n"
+            "bx     %1            \n"
+            :: "r"(psp), "r"(RETURN_ON_PSP)
     );
-
-    __asm__("cpsie if" ::: "memory");
-    __asm__("bx %0\n"::"r"(RETURN_ON_PSP));
 }
 
 void scheduler_yield(void) {
     SCB_ICSR |= SCB_ICSR_PENDSVSET;
     __asm__(
-        "nop\n"
-        "nop\n"
-        "nop\n"
-        "nop\n"
+        "nop        \n"
+        "nop        \n"
+        "nop        \n"
+        "nop        \n"
     );
 }
