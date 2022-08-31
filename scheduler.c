@@ -73,7 +73,7 @@ void scheduler_task(scheduler_t *scheduler, int task_no, void (*entry)(void)) {
 
 static void scheduler_switch(scheduler_t *scheduler) {
     do {
-        scheduler->current_task = (scheduler->current_task) % SCHEDULER_NUM_TASKS;
+        scheduler->current_task = (scheduler->current_task + 1) % SCHEDULER_NUM_TASKS;
     } while (!scheduler->tasks[scheduler->current_task].runnable);
 }
 
