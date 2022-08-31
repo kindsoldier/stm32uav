@@ -33,7 +33,7 @@ OBJS+= main.o
 OBJS+= syscall.o
 OBJS+= usartu.o
 OBJS+= scheduler.o
-OBJS+= semoper.o
+OBJS+= atomic.o
 OBJS+= semaphore.o
 
 main.elf: $(OBJS)

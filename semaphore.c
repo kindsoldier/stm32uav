@@ -3,7 +3,7 @@
  */
 
 #include "semaphore.h"
-#include "semoper.h"
+#include "atomic.h"
 
 void sem_init(sem_t* sem, int32_t value) {
     sem->value = value;

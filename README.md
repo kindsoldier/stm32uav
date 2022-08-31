@@ -46,24 +46,20 @@ NanoOS: "Make less makes no sense" =)
 #### Ouput
 
 ```
-task 1 6932
-task 2 7157
-task 3 7390
-task 4 7627 2
-task 1 13844
-task 2 14301
-task 3 14762
-task 4 15235 3
-task 1 20760
-task 2 21449
-task 3 22138
-task 4 22843 4
-task 1 27676
-task 2 28597
-task 3 29514
-task 4 30451 5
-task 1 34592
-task 2 35745
-task 3 36890
-task 4 38059 6
+task 2 1
+task 3 14
+task 4 27 1
+task 1 44
+task 2 6341
+task 3 6362
+task 4 6379 2
+task 1 6400
+task 2 12689
+task 3 12710
+task 4 12727 3
+task 1 12752
+task 2 19037
+task 3 19058
+task 4 19079 4
+task 1 19104
 ```

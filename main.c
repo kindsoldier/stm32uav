@@ -18,7 +18,7 @@
 
 #include "scheduler.h"
 #include "usartu.h"
-#include "semoper.h"
+#include "atomic.h"
 #include "semaphore.h"
 
 
