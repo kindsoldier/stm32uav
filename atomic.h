@@ -10,4 +10,6 @@
 int32_t atomic_inc32(volatile int32_t *addr, int32_t value);
 int32_t atomic_dec32(volatile int32_t *addr, int32_t value);
 
+
+int32_t atomic_dec32le0(volatile int32_t *addr, int32_t value);
 #endif
