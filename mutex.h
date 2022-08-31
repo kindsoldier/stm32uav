@@ -10,5 +10,5 @@ typedef struct {
 } mutex_t;
 
 void mutex_init(mutex_t* mutex);
-int32_t mutex_wait(mutex_t* mutex);
-int32_t mutex_post(mutex_t* mutex);
+int32_t mutex_lock(mutex_t* mutex);
+int32_t mutex_unlock(mutex_t* mutex);
