@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2022 Oleg Borodin  <borodin@unix7.org>
  */
@@ -10,7 +11,6 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/usart.h>
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -21,9 +21,12 @@
 #include "atomic.h"
 #include "semaphore.h"
 
+static int          g_uptime;
+static sem_t        g_sem;
+static scheduler_t  g_scheduler;
 
 void delay(uint32_t n) {
-    for (volatile int i = 0; i < n * 800; i++)
+    for (int i = 0; i < n * 800; i++)
         __asm__("nop");
 }
 
@@ -59,9 +62,6 @@ static void systick_setup(void) {
     systick_counter_enable();
 }
 
-int g_uptime;
-sem_t g_sem;
-
 void task1(void) {
     while (true) {
         sem_wait(&g_sem);
@@ -91,6 +91,7 @@ void task3(void) {
 
 void task4(void) {
     static volatile int32_t t4;
+
     while (true) {
         atomic_inc32(&t4, (int32_t)1);
         sem_wait(&g_sem);
@@ -105,14 +106,13 @@ void sys_tick_handler(void) {
     scheduler_yield();
 }
 
-
 int main(void) {
     g_uptime = 0;
     sem_init(&g_sem, 1);
-    static scheduler_t g_scheduler;
 
     clock_setup();
     usart_setup();
+
     scheduler_init(&g_scheduler);
     scheduler_task(&g_scheduler, 0, task1);
     scheduler_task(&g_scheduler, 1, task2);

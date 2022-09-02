@@ -41,8 +41,8 @@ static void task_exit_func(void) {
 #define STACK_FILL 0xA5
 
 void scheduler_init(scheduler_t *scheduler) {
-
-    for (int i = 0; i < SCHEDULER_NUM_TASKS; i++) {
+    int i;
+    for (i = 0; i < SCHEDULER_NUM_TASKS; i++) {
         task_t *task = &(scheduler->tasks[i]);
         task->stack = NULL;
         task->stack_size = 0;
