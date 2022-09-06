@@ -60,11 +60,10 @@ static void usart_setup(void) {
     usart_enable(USART1);
 }
 
-const uint32_t systic_freq = 100 * 1000;
+const uint32_t systic_freq = 50 * 1000;
 
 static void systick_setup(void) {
     g_sys_tick_counter = 0;
-
 
     gpio_mode_setup(GPIOB, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO6);
     gpio_set_output_options(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO6);
@@ -89,7 +88,6 @@ static void i2c_setup(void) {
 
 void sys_tick_handler(void) {
     g_sys_tick_counter++;
-    //gpio_toggle(GPIOB, GPIO6);
 }
 
 uint32_t sys_tick_counter(void) {
@@ -97,9 +95,174 @@ uint32_t sys_tick_counter(void) {
     return val;
 }
 
-void ahrs_update(float gx, float gy, float gz, float ax, float ay, float az) {
+typedef struct angle_s {
+    double z;   // yaw
+    double y;   // pitch
+    double x;   // roll
+} angle_t;
 
+
+typedef struct quaternion_s {
+    double w;
+    double x;
+    double y;
+    double z;
+} quaternion_t;
+
+
+double invSqrt(double x) {
+    return 1.0f / sqrt(x);
 }
+
+void ahrs_update(double dt, quaternion_t* q, mpu_value_t* m) {
+
+    double q0 = q->w;
+    double q1 = q->x;
+    double q2 = q->y;
+    double q3 = q->z;      // quaternion of sensor frame relative to auxiliary frame
+
+    double gx = m->gx;
+    double gy = m->gy;
+    double gz = m->gz;
+
+    double ax = m->ax;
+    double ay = m->ay;
+    double az = m->az;
+
+    double beta = 0.1f;  // 2 * proportional gain (Kp)
+    double recipNorm;
+    double s0, s1, s2, s3;
+    double qDot1, qDot2, qDot3, qDot4;
+    double _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2, _8q1, _8q2, q0q0, q1q1, q2q2, q3q3;
+
+    // Rate of change of quaternion from gyroscope
+    qDot1 = 0.5f * (-q1*gx - q2*gy - q3*gz);
+    qDot2 = 0.5f * ( q0*gx + q2*gz - q3*gy);
+    qDot3 = 0.5f * ( q0*gy - q1*gz + q3*gx);
+    qDot4 = 0.5f * ( q0*gz + q1*gy - q2*gx);
+
+    // Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
+    if (!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
+
+        // Normalise accelerometer measurement
+        recipNorm = invSqrt(ax*ax + ay*ay + az*az);
+        ax *= recipNorm;
+        ay *= recipNorm;
+        az *= recipNorm;
+
+        // Auxiliary variables to avoid repeated arithmetic
+        _2q0 = 2.0f * q0;
+        _2q1 = 2.0f * q1;
+        _2q2 = 2.0f * q2;
+        _2q3 = 2.0f * q3;
+        _4q0 = 4.0f * q0;
+        _4q1 = 4.0f * q1;
+        _4q2 = 4.0f * q2;
+        _8q1 = 8.0f * q1;
+        _8q2 = 8.0f * q2;
+        q0q0 = q0 * q0;
+        q1q1 = q1 * q1;
+        q2q2 = q2 * q2;
+        q3q3 = q3 * q3;
+
+        // Gradient decent algorithm corrective step
+        s0 =     _4q0*q2q2    + _2q2*ax +    _4q0*q1q1 - _2q1*ay;
+        s1 =     _4q1*q3q3    - _2q3*ax + 4.0f*q0q0*q1 - _2q0*ay - _4q1 + _8q1*q1q1 + _8q1*q2q2 + _4q1*az;
+        s2 = 4.0f*q0q0*q2     + _2q0*ax +    _4q2*q3q3 - _2q3*ay - _4q2 + _8q2*q1q1 + _8q2*q2q2 + _4q2*az;
+        s3 = 4.0f*q1q1*q3     - _2q1*ax + 4.0f*q2q2*q3 - _2q2*ay;
+
+        recipNorm = invSqrt(s0*s0 + s1*s1 + s2*s2 + s3*s3);     // normalise step magnitude
+        s0 *= recipNorm;
+        s1 *= recipNorm;
+        s2 *= recipNorm;
+        s3 *= recipNorm;
+
+        // Apply feedback step
+        qDot1 -= beta * s0;
+        qDot2 -= beta * s1;
+        qDot3 -= beta * s2;
+        qDot4 -= beta * s3;
+    }
+
+    // Integrate rate of change of quaternion to yield quaternion
+    q0 += qDot1 * dt;
+    q1 += qDot2 * dt;
+    q2 += qDot3 * dt;
+    q3 += qDot4 * dt;
+
+    // Normalise quaternion
+    recipNorm = invSqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+    q0 *= recipNorm;
+    q1 *= recipNorm;
+    q2 *= recipNorm;
+    q3 *= recipNorm;
+
+    q->w = q0;
+    q->x = q1;
+    q->y = q2;
+    q->z = q3;
+}
+
+double radian2degrees(double radians) {
+    return radians * (180.0f / M_PI);
+}
+
+double degress2radian(double degress) {
+    return degress * (M_PI / 180.0f);
+}
+
+void quaternion_init(quaternion_t* q) {
+    q->w = 1.0f;
+    q->x = 0.0f;
+    q->y = 0.0f;
+    q->z = 0.0f;
+}
+
+void angle_init(angle_t* a) {
+    a->z = 0.0f;
+    a->y = 0.0f;
+    a->x = 0.0f;
+}
+
+void angle_degress(angle_t* a) {
+    a->z *= (180.0f / M_PI);
+    a->y *= (180.0f / M_PI);
+    a->x *= (180.0f / M_PI);
+}
+
+double sgn(double x) {
+    return copysignf(1.f,x);
+}
+
+angle_t quaternion2xyz(quaternion_t* q) {
+    angle_t a;
+
+    double x = q->x;
+    double y = q->y;
+    double z = q->z;
+    double w = q->w;
+
+    double t0 = (x + z)*(x - z);     // x^2-z^2
+    double t1 = (w + y)*(w - y);     // w^2-y^2
+
+    double xx = 0.5f * (t0 + t1);    // 1/2 x of x'
+    double xy = x*y + w*z;           // 1/2 y of x'
+    double xz = w*y - x*z;           // 1/2 z of x'
+
+    double t  = xx*xx + xy*xy;       // cos(theta)^2
+    double yz = 2.0f * (y*z + w*x);  // z of y'
+
+    a.z = atan2(xy, xx);             // yaw   (psi)
+    a.y = atan(xz /sqrt(t));         // pitch (theta)
+
+    if (t != 0) {
+        a.x = atan2(yz, t1 - t0);
+    } else {
+        a.x = (2.0 * atan2(x, w) - sgn(xz) * a.z);
+    }
+    return a;
+}
+
 
 int main(void) {
 
@@ -110,33 +273,40 @@ int main(void) {
     i2c_setup();
     systick_setup();
 
-    mpu_t mpu;
-    mpu_setup(&mpu, I2C1, 0x68);
-    mpu_calibrate(&mpu, 5000);
     printf("==== start ====\r\n");
 
-    mpu_value_t val;
+    mpu_t mpu;
+    mpu_setup(&mpu, I2C1, 0x68);
+    _delay(10);
+    mpu_calibrate(&mpu, 20000);
+    printf("==== mpu ====\r\n");
 
-    uint32_t old_time = 0;
-    uint32_t new_time = 0;
+    mpu_value_t mval;
 
-    float freq = 100.0f;
-    uint32_t delta = 0.0f;
+    uint32_t prev_ts = 0, last_ts = 0;
 
+    quaternion_t q;
+    quaternion_init(&q);
+
+    int i = 0;
     while (true) {
-            mpu_read(&mpu, &val);
-            gpio_toggle(GPIOB, GPIO6);
+        mpu_read(&mpu, &mval);
 
-            ahrs_update(val.gx, val.gy, val.gz, val.ax, val.ay, val.az);
+        gpio_toggle(GPIOB, GPIO6);
+        //if ((i % 350) == 0) {
+        //    printf("gx=%8.4f gy=%8.4f gz=%8.4f ax=%8.4f ay=%8.4f az=%8.4f \r\n", mval.gx, mval.gy, mval.gz, mval.ax, mval.ay, mval.az);
+        //}
+        i++;
+        last_ts = g_sys_tick_counter;
+        float dt = (float)(last_ts - prev_ts) / (float)systic_freq;
+        prev_ts = last_ts;
 
-            printf("%12.3f\r\n", freq);
+        ahrs_update(dt, &q, &mval);
 
-        new_time = g_sys_tick_counter;
-        delta = (float)(old_time - new_time);
-        if (delta != 0.0f) {
-            freq = (float)systic_freq / (float)(new_time - old_time);
-            //printf("%12.3f\r\n", freq);
-        }
-        old_time = new_time;
+        angle_t a = quaternion2xyz(&q);
+        angle_degress(&a);
+
+        printf("dt=%.6f y=%10.4f x=%10.4f z=%10.4f  \r\n", dt, a.y, a.x, a.z);
+
     };
 }
