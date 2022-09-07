@@ -6,12 +6,12 @@
 #include <stdint.h>
 
 typedef struct {
-    float ax;
-    float ay;
-    float az;
-    float gx;
-    float gy;
-    float gz;
+    double ax;
+    double ay;
+    double az;
+    double gx;
+    double gy;
+    double gz;
 } mpu_value_t;
 
 typedef struct {

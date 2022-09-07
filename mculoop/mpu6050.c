@@ -94,6 +94,9 @@
 #define MPU_PWR2_STBY_YG_BIT            1
 #define MPU_PWR2_STBY_ZG_BIT            0
 
+
+//static void i2cdev_reg_setbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask);
+//static void i2cdev_reg_cleanbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask);
 //static uint8_t i2cdev_read_reg8(uint32_t i2c, uint8_t addr, uint8_t reg);
 static void i2cdev_write_reg8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t value);
 static void i2cdev_read_seq8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t* buffer, uint8_t size);
@@ -105,7 +108,13 @@ static void i2cdev_write_reg8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t v
     i2c_transfer7(i2c, addr, buffer, 2, NULL, 0);
 }
 
-//static void i2cdev_reg_setbit(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask) {
+//static uint8_t i2cdev_read_reg8(uint32_t i2c, uint8_t addr, uint8_t reg) {
+//    uint8_t val;
+//    i2c_transfer7(i2c, addr, &reg, 1, &val, 1);
+//    return val;
+//}
+
+//static void i2cdev_reg_setbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask) {
 //    uint8_t buffer[2];
 //    buffer[0] = reg;
 //    buffer[1] = 0x00;
@@ -114,23 +123,25 @@ static void i2cdev_write_reg8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t v
 //    i2c_transfer7(i2c, addr, buffer, 2, NULL, 0);
 //}
 
-//static uint8_t i2cdev_read_reg8(uint32_t i2c, uint8_t addr, uint8_t reg) {
-//    uint8_t val;
-//    i2c_transfer7(i2c, addr, &reg, 1, &val, 1);
-//    return val;
+//static void i2cdev_reg_cleanbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask) {
+//    uint8_t buffer[2];
+//    buffer[0] = reg;
+//    buffer[1] = 0x00;
+//    i2c_transfer7(i2c, addr, &buffer[0], 1, &buffer[1], 1);
+//    buffer[1] &= ~(mask);
+//    i2c_transfer7(i2c, addr, buffer, 2, NULL, 0);
 //}
-
 
 static void i2cdev_read_seq8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t* buffer, uint8_t size) {
     i2c_transfer7(i2c, addr, &reg, 1, buffer, size);
 }
 
 
-#define MPU_GYRO_LSB MPU_GYRO_LSB_1000
-#define MPU_GYRO_FS  MPU_GYRO_FS_1000
+#define MPU_GYRO_LSB   MPU_GYRO_LSB_1000
+#define MPU_GYRO_FS    MPU_GYRO_FS_1000
 
-#define MPU_ACCEL_LSB MPU_ACCEL_LSB_16
-#define MPU_ACCEL_FS MPU_ACCEL_FS_16
+#define MPU_ACCEL_LSB  MPU_ACCEL_LSB_16
+#define MPU_ACCEL_FS   MPU_ACCEL_FS_16
 
 void mpu_setup(mpu_t* mpu, uint32_t i2c, uint8_t addr) {
 
@@ -145,8 +156,7 @@ void mpu_setup(mpu_t* mpu, uint32_t i2c, uint8_t addr) {
     mpu->err.gz = 0;
 
     //i2cdev_write_reg8(i2c, addr, MPU_REG_PWR_MGMT_1, 1 << MPU_PWR1_DEVICE_RESET_BIT);
-
-    for (int i = 0; i < 10000; i++) __asm__("nop");
+    //for (int i = 0; i < 10000; i++) __asm__("nop");
 
     i2cdev_write_reg8(i2c, addr, MPU_REG_PWR_MGMT_1, 0x00);
 
@@ -169,17 +179,17 @@ static void mpu_rawread(mpu_t* mpu, mpu_value_t* val) {
     int16_t gy = (((int16_t)buffer[10]) << 8) | buffer[11];
     int16_t gz = (((int16_t)buffer[12]) << 8) | buffer[13];
 
-    val->ax = (float)ax / (float)MPU_ACCEL_LSB;
-    val->ay = (float)ay / (float)MPU_ACCEL_LSB;
-    val->az = (float)az / (float)MPU_ACCEL_LSB;
+    val->ax = (double)ax / (double)MPU_ACCEL_LSB;
+    val->ay = (double)ay / (double)MPU_ACCEL_LSB;
+    val->az = (double)az / (double)MPU_ACCEL_LSB;
 
-    val->gx = (float)gx / (float)MPU_GYRO_LSB;
-    val->gy = (float)gy / (float)MPU_GYRO_LSB;
-    val->gz = (float)gz / (float)MPU_GYRO_LSB;
+    val->gx = (double)gx / (double)MPU_GYRO_LSB;
+    val->gy = (double)gy / (double)MPU_GYRO_LSB;
+    val->gz = (double)gz / (double)MPU_GYRO_LSB;
 
-    val->gx *= M_PI / 180.0f;
-    val->gy *= M_PI / 180.0f;
-    val->gz *= M_PI / 180.0f;
+    val->gx *= M_PI / 180.0;
+    val->gy *= M_PI / 180.0;
+    val->gz *= M_PI / 180.0;
 
 }
 
@@ -195,12 +205,14 @@ void mpu_calibrate(mpu_t* mpu, int count) {
     for (int i = 0; i < count; i++) {
         mpu_rawread(mpu, &val);
 
-        mpu->err.gx += (float)val.gx / count;
-        mpu->err.gy += (float)val.gy / count;
-        mpu->err.gz += (float)val.gz / count;
+        mpu->err.gx += val.gx / (double)count;
+        mpu->err.gy += val.gy / (double)count;
+        mpu->err.gz += val.gz / (double)count;
+
+        mpu->err.ax += val.ax / (double)count;
+        mpu->err.ay += val.ay / (double)count;
     }
 }
-
 
 void mpu_read(mpu_t* mpu, mpu_value_t* val) {
     mpu_rawread(mpu, val);
@@ -209,4 +221,7 @@ void mpu_read(mpu_t* mpu, mpu_value_t* val) {
     val->gy -= mpu->err.gy;
     val->gz -= mpu->err.gz;
 
+    val->ax -= mpu->err.ax;
+    val->ay -= mpu->err.ay;
+    val->az -= mpu->err.az;
 }

@@ -60,7 +60,7 @@ static void usart_setup(void) {
     usart_enable(USART1);
 }
 
-const uint32_t systic_freq = 50 * 1000;
+const uint32_t systic_freq = 100 * 1000;
 
 static void systick_setup(void) {
     g_sys_tick_counter = 0;
@@ -114,7 +114,100 @@ double invSqrt(double x) {
     return 1.0f / sqrt(x);
 }
 
-void ahrs_update(double dt, quaternion_t* q, mpu_value_t* m) {
+volatile float twoKp = (2.0f * 0.5f);                    // 2 * proportional gain (Kp)
+volatile float twoKi = (2.0f * 0.0f);                    // 2 * integral gain (Ki)
+
+volatile float integralFBx = 0.0f;
+volatile float integralFBy = 0.0f;
+volatile float integralFBz = 0.0f;
+
+void quaternion_update_mahony(double dt, quaternion_t* q, mpu_value_t* m) {
+
+    double q0 = q->w;
+    double q1 = q->x;
+    double q2 = q->y;
+    double q3 = q->z;      // quaternion of sensor frame relative to auxiliary frame
+
+    double gx = m->gx;
+    double gy = m->gy;
+    double gz = m->gz;
+
+    double ax = m->ax;
+    double ay = m->ay;
+    double az = m->az;
+
+    double recipNorm;
+    double halfvx, halfvy, halfvz;
+    double halfex, halfey, halfez;
+    double qa, qb, qc;
+
+    // Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
+    if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
+
+        // Normalise accelerometer measurement
+        recipNorm = invSqrt(ax*ax + ay*ay + az*az);
+        ax *= recipNorm;
+        ay *= recipNorm;
+        az *= recipNorm;
+
+        // Estimated direction of gravity and vector perpendicular to magnetic flux
+        halfvx = q1*q3 - q0*q2;
+        halfvy = q0*q1 + q2*q3;
+        halfvz = q0*q0 - 0.5f + q3*q3;
+
+        // Error is sum of cross product between estimated and measured direction of gravity
+        halfex = (ay*halfvz - az*halfvy);
+        halfey = (az*halfvx - ax*halfvz);
+        halfez = (ax*halfvy - ay*halfvx);
+
+        // Compute and apply integral feedback if enabled
+        if(twoKi > 0.0f) {
+            integralFBx += twoKi*halfex*dt;    // integral error scaled by Ki
+            integralFBy += twoKi*halfey*dt;
+            integralFBz += twoKi*halfez*dt;
+            gx += integralFBx;  // apply integral feedback
+            gy += integralFBy;
+            gz += integralFBz;
+        }
+        else {
+            integralFBx = 0.0f; // prevent integral windup
+            integralFBy = 0.0f;
+            integralFBz = 0.0f;
+        }
+        // Apply proportional feedback
+        gx += twoKp*halfex;
+        gy += twoKp*halfey;
+        gz += twoKp*halfez;
+    }
+
+    // Integrate rate of change of quaternion
+    gx *= (0.5f*dt);      // pre-multiply common factors
+    gy *= (0.5f*dt);
+    gz *= (0.5f*dt);
+
+    qa = q0;
+    qb = q1;
+    qc = q2;
+
+    q0 += (-qb*gx - qc*gy - q3*gz);
+    q1 += ( qa*gx + qc*gz - q3*gy);
+    q2 += ( qa*gy - qb*gz + q3*gx);
+    q3 += ( qa*gz + qb*gy - qc*gx);
+
+    // Normalise quaternion
+    recipNorm = invSqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+    q0 *= recipNorm;
+    q1 *= recipNorm;
+    q2 *= recipNorm;
+    q3 *= recipNorm;
+
+    q->w = q0;
+    q->x = q1;
+    q->y = q2;
+    q->z = q3;
+}
+
+void quaternion_update(double dt, quaternion_t* q, mpu_value_t* m) {
 
     double q0 = q->w;
     double q1 = q->x;
@@ -133,16 +226,15 @@ void ahrs_update(double dt, quaternion_t* q, mpu_value_t* m) {
     double recipNorm;
     double s0, s1, s2, s3;
     double qDot1, qDot2, qDot3, qDot4;
-    double _2q0, _2q1, _2q2, _2q3, _4q0, _4q1, _4q2, _8q1, _8q2, q0q0, q1q1, q2q2, q3q3;
 
     // Rate of change of quaternion from gyroscope
-    qDot1 = 0.5f * (-q1*gx - q2*gy - q3*gz);
-    qDot2 = 0.5f * ( q0*gx + q2*gz - q3*gy);
-    qDot3 = 0.5f * ( q0*gy - q1*gz + q3*gx);
-    qDot4 = 0.5f * ( q0*gz + q1*gy - q2*gx);
+    qDot1 = 0.5 * (-q1*gx - q2*gy - q3*gz);
+    qDot2 = 0.5 * ( q0*gx + q2*gz - q3*gy);
+    qDot3 = 0.5 * ( q0*gy - q1*gz + q3*gx);
+    qDot4 = 0.5 * ( q0*gz + q1*gy - q2*gx);
 
     // Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
-    if (!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
+    if (!((ax == 0.0) && (ay == 0.0) && (az == 0.0))) {
 
         // Normalise accelerometer measurement
         recipNorm = invSqrt(ax*ax + ay*ay + az*az);
@@ -150,28 +242,14 @@ void ahrs_update(double dt, quaternion_t* q, mpu_value_t* m) {
         ay *= recipNorm;
         az *= recipNorm;
 
-        // Auxiliary variables to avoid repeated arithmetic
-        _2q0 = 2.0f * q0;
-        _2q1 = 2.0f * q1;
-        _2q2 = 2.0f * q2;
-        _2q3 = 2.0f * q3;
-        _4q0 = 4.0f * q0;
-        _4q1 = 4.0f * q1;
-        _4q2 = 4.0f * q2;
-        _8q1 = 8.0f * q1;
-        _8q2 = 8.0f * q2;
-        q0q0 = q0 * q0;
-        q1q1 = q1 * q1;
-        q2q2 = q2 * q2;
-        q3q3 = q3 * q3;
-
         // Gradient decent algorithm corrective step
-        s0 =     _4q0*q2q2    + _2q2*ax +    _4q0*q1q1 - _2q1*ay;
-        s1 =     _4q1*q3q3    - _2q3*ax + 4.0f*q0q0*q1 - _2q0*ay - _4q1 + _8q1*q1q1 + _8q1*q2q2 + _4q1*az;
-        s2 = 4.0f*q0q0*q2     + _2q0*ax +    _4q2*q3q3 - _2q3*ay - _4q2 + _8q2*q1q1 + _8q2*q2q2 + _4q2*az;
-        s3 = 4.0f*q1q1*q3     - _2q1*ax + 4.0f*q2q2*q3 - _2q2*ay;
+        s0 = 4.0*q0*q2*q2 + 2.0*q2*ax + 4.0*q0*q1*q1 - 2.0*q1*ay;
+        s1 = 4.0*q1*q3*q3 - 2.0*q3*ax + 4.0*q0*q0*q1 - 2.0*q0*ay - 4.0*q1 + 8.0*q1*q1*q1 + 8.0*q1*q2*q2 + 4.0*q1*az;
+        s2 = 4.0*q0*q0*q2 + 2.0*q0*ax + 4.0*q2*q3*q3 - 2.0*q3*ay - 4.0*q2 + 8.0*q2*q1*q1 + 8.0*q2*q2*q2 + 4.0*q2*az;
+        s3 = 4.0*q1*q1*q3 - 2.0*q1*ax + 4.0*q2*q2*q3 - 2.0*q2*ay;
 
-        recipNorm = invSqrt(s0*s0 + s1*s1 + s2*s2 + s3*s3);     // normalise step magnitude
+        // Normalise step magnitude
+        recipNorm = invSqrt(s0*s0 + s1*s1 + s2*s2 + s3*s3);
         s0 *= recipNorm;
         s1 *= recipNorm;
         s2 *= recipNorm;
@@ -202,6 +280,7 @@ void ahrs_update(double dt, quaternion_t* q, mpu_value_t* m) {
     q->y = q2;
     q->z = q3;
 }
+
 
 double radian2degrees(double radians) {
     return radians * (180.0f / M_PI);
@@ -245,12 +324,12 @@ angle_t quaternion2xyz(quaternion_t* q) {
     double t0 = (x + z)*(x - z);     // x^2-z^2
     double t1 = (w + y)*(w - y);     // w^2-y^2
 
-    double xx = 0.5f * (t0 + t1);    // 1/2 x of x'
+    double xx = 0.5 * (t0 + t1);     // 1/2 x of x'
     double xy = x*y + w*z;           // 1/2 y of x'
     double xz = w*y - x*z;           // 1/2 z of x'
 
     double t  = xx*xx + xy*xy;       // cos(theta)^2
-    double yz = 2.0f * (y*z + w*x);  // z of y'
+    double yz = 2.0 * (y*z + w*x);   // z of y'
 
     a.z = atan2(xy, xx);             // yaw   (psi)
     a.y = atan(xz /sqrt(t));         // pitch (theta)
@@ -263,6 +342,13 @@ angle_t quaternion2xyz(quaternion_t* q) {
     return a;
 }
 
+void angle_norm(angle_t* a) {
+    double n = sqrt(a->x*a->x + a->y*a->y + a->z*a->z);
+    a->x *= n;
+    a->y *= n;
+    a->z *= n;
+}
+
 
 int main(void) {
 
@@ -273,35 +359,29 @@ int main(void) {
     i2c_setup();
     systick_setup();
 
-    printf("==== start ====\r\n");
-
     mpu_t mpu;
+    printf("==== mpu initialize ====\r\n");
     mpu_setup(&mpu, I2C1, 0x68);
-    _delay(10);
+    _delay(100);
     mpu_calibrate(&mpu, 20000);
-    printf("==== mpu ====\r\n");
+    printf("==== mpu started ====\r\n");
 
     mpu_value_t mval;
-
-    uint32_t prev_ts = 0, last_ts = 0;
-
     quaternion_t q;
     quaternion_init(&q);
 
-    int i = 0;
+    uint32_t prev_ts = 0;
+    uint32_t last_ts = 0;
+
+    printf("==== main loop ====\r\n");
     while (true) {
         mpu_read(&mpu, &mval);
 
-        gpio_toggle(GPIOB, GPIO6);
-        //if ((i % 350) == 0) {
-        //    printf("gx=%8.4f gy=%8.4f gz=%8.4f ax=%8.4f ay=%8.4f az=%8.4f \r\n", mval.gx, mval.gy, mval.gz, mval.ax, mval.ay, mval.az);
-        //}
-        i++;
         last_ts = g_sys_tick_counter;
-        float dt = (float)(last_ts - prev_ts) / (float)systic_freq;
+        double dt = (float)(last_ts - prev_ts) / (float)systic_freq;
         prev_ts = last_ts;
 
-        ahrs_update(dt, &q, &mval);
+        quaternion_update(dt, &q, &mval);
 
         angle_t a = quaternion2xyz(&q);
         angle_degress(&a);
