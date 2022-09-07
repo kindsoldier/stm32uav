@@ -4,7 +4,7 @@
 
 .SECONDARY:
 
-CFLAGS+= -I. -Os -DSTM32F4 #-std=c99
+CFLAGS+= -I. -O2 -DSTM32F4 #-std=c99
 CFLAGS+= -mfloat-abi=hard
 CFLAGS+= -mcpu=cortex-m4
 CFLAGS+= -mthumb
@@ -31,6 +31,9 @@ OBJS+= main.o
 OBJS+= syscall.o
 OBJS+= usartu.o
 OBJS+= mpu6050.o
+OBJS+= geometry.o
+OBJS+= madgwick.o
+OBJS+= i2cdev.o
 
 main.elf: $(OBJS)
 	$(TARGET)-gcc $(^F) $(LDFLAGS) -o $@

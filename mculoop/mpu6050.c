@@ -2,11 +2,11 @@
  * Copyright 2022 Oleg Borodin  <borodin@unix7.org>
  */
 
-
 #include <libopencm3/stm32/i2c.h>
 #include <stdint.h>
 #include <math.h>
 
+#include <i2cdev.h>
 #include <mpu6050.h>
 
 #define MPU_REG_SMPLRT_DIV       0x19
@@ -94,66 +94,20 @@
 #define MPU_PWR2_STBY_YG_BIT            1
 #define MPU_PWR2_STBY_ZG_BIT            0
 
-
-//static void i2cdev_reg_setbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask);
-//static void i2cdev_reg_cleanbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask);
-//static uint8_t i2cdev_read_reg8(uint32_t i2c, uint8_t addr, uint8_t reg);
-static void i2cdev_write_reg8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t value);
-static void i2cdev_read_seq8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t* buffer, uint8_t size);
-
-static void i2cdev_write_reg8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t value) {
-    uint8_t buffer[2];
-    buffer[0] = reg;
-    buffer[1] = value;
-    i2c_transfer7(i2c, addr, buffer, 2, NULL, 0);
-}
-
-//static uint8_t i2cdev_read_reg8(uint32_t i2c, uint8_t addr, uint8_t reg) {
-//    uint8_t val;
-//    i2c_transfer7(i2c, addr, &reg, 1, &val, 1);
-//    return val;
-//}
-
-//static void i2cdev_reg_setbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask) {
-//    uint8_t buffer[2];
-//    buffer[0] = reg;
-//    buffer[1] = 0x00;
-//    i2c_transfer7(i2c, addr, &buffer[0], 1, &buffer[1], 1);
-//    buffer[1] |= mask;
-//    i2c_transfer7(i2c, addr, buffer, 2, NULL, 0);
-//}
-
-//static void i2cdev_reg_cleanbits(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t mask) {
-//    uint8_t buffer[2];
-//    buffer[0] = reg;
-//    buffer[1] = 0x00;
-//    i2c_transfer7(i2c, addr, &buffer[0], 1, &buffer[1], 1);
-//    buffer[1] &= ~(mask);
-//    i2c_transfer7(i2c, addr, buffer, 2, NULL, 0);
-//}
-
-static void i2cdev_read_seq8(uint32_t i2c, uint8_t addr, uint8_t reg, uint8_t* buffer, uint8_t size) {
-    i2c_transfer7(i2c, addr, &reg, 1, buffer, size);
-}
-
-
 #define MPU_GYRO_LSB   MPU_GYRO_LSB_1000
 #define MPU_GYRO_FS    MPU_GYRO_FS_1000
 
 #define MPU_ACCEL_LSB  MPU_ACCEL_LSB_16
 #define MPU_ACCEL_FS   MPU_ACCEL_FS_16
 
-void mpu_setup(mpu_t* mpu, uint32_t i2c, uint8_t addr) {
+void imu_setup(imu_t* imu, uint32_t i2c, uint8_t addr) {
 
-    mpu->bus    = i2c;
-    mpu->addr   = addr;
+    imu->bus    = i2c;
+    imu->addr   = addr;
 
-    mpu->err.ax = 0;
-    mpu->err.ay = 0;
-    mpu->err.az = 0;
-    mpu->err.gx = 0;
-    mpu->err.gy = 0;
-    mpu->err.gz = 0;
+    imu->gxe = 0;
+    imu->gye = 0;
+    imu->gze = 0;
 
     //i2cdev_write_reg8(i2c, addr, MPU_REG_PWR_MGMT_1, 1 << MPU_PWR1_DEVICE_RESET_BIT);
     //for (int i = 0; i < 10000; i++) __asm__("nop");
@@ -166,10 +120,10 @@ void mpu_setup(mpu_t* mpu, uint32_t i2c, uint8_t addr) {
 }
 
 
-static void mpu_rawread(mpu_t* mpu, mpu_value_t* val) {
+static void imu_rawread(imu_t* imu, imuvec_t* val) {
 
     uint8_t buffer[14];
-    i2cdev_read_seq8(mpu->bus, mpu->addr, MPU_REG_ACCEL_XOUT_H, (uint8_t*)buffer, 14);
+    i2cdev_read_seq8(imu->bus, imu->addr, MPU_REG_ACCEL_XOUT_H, (uint8_t*)buffer, 14);
 
     int16_t ax = (((int16_t)buffer[0]) << 8) | buffer[1];
     int16_t ay = (((int16_t)buffer[2]) << 8) | buffer[3];
@@ -193,8 +147,8 @@ static void mpu_rawread(mpu_t* mpu, mpu_value_t* val) {
 
 }
 
-void mpu_calibrate(mpu_t* mpu, int count) {
-    mpu_value_t val;
+void imu_calibrate(imu_t* imu, int loops) {
+    imuvec_t val;
     val.ax = 0;
     val.ay = 0;
     val.az = 0;
@@ -202,26 +156,41 @@ void mpu_calibrate(mpu_t* mpu, int count) {
     val.gy = 0;
     val.gz = 0;
 
-    for (int i = 0; i < count; i++) {
-        mpu_rawread(mpu, &val);
-
-        mpu->err.gx += val.gx / (double)count;
-        mpu->err.gy += val.gy / (double)count;
-        mpu->err.gz += val.gz / (double)count;
-
-        mpu->err.ax += val.ax / (double)count;
-        mpu->err.ay += val.ay / (double)count;
+    for (int i = 0; i < loops; i++) {
+        imu_rawread(imu, &val);
+        imu->gxe += val.gx / (double)loops;
+        imu->gye += val.gy / (double)loops;
+        imu->gze += val.gz / (double)loops;
     }
 }
 
-void mpu_read(mpu_t* mpu, mpu_value_t* val) {
-    mpu_rawread(mpu, val);
+void imu_gettilt(imu_t* imu, int loops, eulerangle_t* a) {
+    imuvec_t val;
+    val.ax = 0;
+    val.ay = 0;
+    val.az = 0;
+    val.gx = 0;
+    val.gy = 0;
+    val.gz = 0;
 
-    val->gx -= mpu->err.gx;
-    val->gy -= mpu->err.gy;
-    val->gz -= mpu->err.gz;
+    double ax = 0;
+    double ay = 0;
+    double az = 0;
 
-    val->ax -= mpu->err.ax;
-    val->ay -= mpu->err.ay;
-    val->az -= mpu->err.az;
+    for (int i = 0; i < loops; i++) {
+        imu_rawread(imu, &val);
+        ax += val.ax / (double)loops;
+        ay += val.ay / (double)loops;
+        az += val.az / (double)loops;
+    }
+    a->x = atan(ax / sqrt(ay*ay + az*az));
+    a->y = atan(ay / sqrt(ax*ax + az*az));
+    a->z = atan(az / sqrt(ax*ax + ay*ay));
+}
+
+void imu_getvec(imu_t* imu, imuvec_t* val) {
+    imu_rawread(imu, val);
+    val->gx -= imu->gxe;
+    val->gy -= imu->gye;
+    val->gz -= imu->gze;
 }
