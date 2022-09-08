@@ -34,6 +34,7 @@ OBJS+= mpu6050.o
 OBJS+= geometry.o
 OBJS+= madgwick.o
 OBJS+= i2cdev.o
+OBJS+= pidcont.o
 
 main.elf: $(OBJS)
 	$(TARGET)-gcc $(^F) $(LDFLAGS) -o $@

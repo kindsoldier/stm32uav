@@ -13,10 +13,10 @@ typedef struct {
 
 
 typedef struct quaternion_s {
-    double w;
-    double x;
-    double y;
-    double z;
+    union { double w; double q0; };
+    union { double x; double q1; };
+    union { double y; double q2; };
+    union { double z; double q3; };
 } quaternion_t;
 
 
@@ -36,6 +36,5 @@ void eulerangle_toradians(eulerangle_t* a);
 
 void quaternion_init(quaternion_t* q);
 void quaternion_toeuler(quaternion_t* q, eulerangle_t* a);
-
 
 #endif

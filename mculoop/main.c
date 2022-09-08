@@ -22,7 +22,7 @@
 #include <mpu6050.h>
 #include <geometry.h>
 #include <madgwick.h>
-
+#include <pidcont.h>
 
 const uint32_t g_systick_freq = 100 * 1000;
 uint32_t g_sys_tick_counter;
@@ -101,7 +101,7 @@ int main(void) {
     imu_t imu;
     printf("==== imu initialize ====\r\n");
     imu_setup(&imu, I2C1, 0x68);
-    imu_calibrate(&imu, 20000);
+    imu_calibrate(&imu, 1000);
     printf("==== imu started ====\r\n");
 
     imuvec_t mval;
@@ -111,7 +111,10 @@ int main(void) {
     uint32_t prev_ts = 0;
     uint32_t last_ts = 0;
 
-    printf("==== main loop ====\r\n");
+    pidcont_t p;
+    pidcont_init(&p);
+    pidcont_setup(&p, 100, 0, 0);
+
 
     while (true) {
         imu_getvec(&imu, &mval);
@@ -126,7 +129,10 @@ int main(void) {
         quaternion_toeuler(&q, &a);
         eulerangle_todegress(&a);
 
-        printf("dt=%.6f y=%10.4f x=%10.4f z=%10.4f  \r\n", dt, a.y, a.x, a.z);
+        //printf("dt=%.6f roll=%8.3f  pitch=%8.3f  yaw=%8.3f\r\n", dt, a.roll, a.pitch, a.yaw);
+
+        double out = pidcont_next(&p, 0, a.pitch, dt);
+        printf("dt=%.6f pitch=%8.3f  out=%10.3f \r\n", dt, a.pitch, out);
 
         //double b2 = 0.0;
         //double K = 0.01;

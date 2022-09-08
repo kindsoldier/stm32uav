@@ -8,10 +8,6 @@
 
 #include <geometry.h>
 
-static double inv_sqrt(double x) {
-    return 1.0 / sqrt(x);
-}
-
 void madgwick(double dt, quaternion_t* q, imuvec_t* m) {
 
     double q0 = q->w;
@@ -42,7 +38,7 @@ void madgwick(double dt, quaternion_t* q, imuvec_t* m) {
     if (!((ax == 0.0) && (ay == 0.0) && (az == 0.0))) {
 
         // Normalise accelerometer measurement
-        recipNorm = inv_sqrt(ax*ax + ay*ay + az*az);
+        recipNorm = 1.0 / sqrt(ax*ax + ay*ay + az*az);
         ax *= recipNorm;
         ay *= recipNorm;
         az *= recipNorm;
@@ -54,7 +50,7 @@ void madgwick(double dt, quaternion_t* q, imuvec_t* m) {
         s3 = 4.0*q1*q1*q3 - 2.0*q1*ax + 4.0*q2*q2*q3 - 2.0*q2*ay;
 
         // Normalise step magnitude
-        recipNorm = inv_sqrt(s0*s0 + s1*s1 + s2*s2 + s3*s3);
+        recipNorm = 1.0 / sqrt(s0*s0 + s1*s1 + s2*s2 + s3*s3);
         s0 *= recipNorm;
         s1 *= recipNorm;
         s2 *= recipNorm;
@@ -74,7 +70,7 @@ void madgwick(double dt, quaternion_t* q, imuvec_t* m) {
     q3 += qDot4 * dt;
 
     // Normalise quaternion
-    recipNorm = inv_sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+    recipNorm = 1.0 / sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
     q0 *= recipNorm;
     q1 *= recipNorm;
     q2 *= recipNorm;
