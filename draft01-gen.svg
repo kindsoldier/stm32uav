@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="56cm" height="40cm" viewBox="76 -50 1104 781" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="47cm" height="40cm" viewBox="76 -50 934 781" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
     <rect style="fill: #c2cee4" x="154.6" y="-12" width="142.4" height="77"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="154.6" y="-12" width="142.4" height="77"/>
@@ -140,11 +140,11 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="619,643.764 614,633.764 619,636.264 624,633.764 "/>
   </g>
   <g>
-    <ellipse style="fill: #ffffff" cx="1171" cy="-15" rx="8" ry="8"/>
-    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="1171" cy="-15" rx="8" ry="8"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1165.34,-9.34312 1171,-15 1176.66,-9.34312 "/>
-    <path style="fill: #000000" d="M 1165.34 -20.6569 C 1165.34,-20.6569 1167.42,-23 1171,-23 C 1174.58,-23 1176.66,-20.6569 1176.66,-20.6569 L 1171,-15 L 1165.34,-20.6569z"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 0.002; stroke: #000000" d="M 1165.34 -20.6569 C 1165.34,-20.6569 1167.42,-23 1171,-23 C 1174.58,-23 1176.66,-20.6569 1176.66,-20.6569 L 1171,-15 L 1165.34,-20.6569"/>
+    <ellipse style="fill: #ffffff" cx="1001" cy="-29" rx="8" ry="8"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="1001" cy="-29" rx="8" ry="8"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="995.343,-23.3431 1001,-29 1006.66,-23.3431 "/>
+    <path style="fill: #000000" d="M 995.343 -34.6569 C 995.343,-34.6569 997.416,-37 1001,-37 C 1004.58,-37 1006.66,-34.6569 1006.66,-34.6569 L 1001,-29 L 995.343,-34.6569z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 0.002; stroke: #000000" d="M 995.343 -34.6569 C 995.343,-34.6569 997.416,-37 1001,-37 C 1004.58,-37 1006.66,-34.6569 1006.66,-34.6569 L 1001,-29 L 995.343,-34.6569"/>
   </g>
   <g>
     <ellipse style="fill: #ffffff" cx="85.425" cy="-40.875" rx="7.725" ry="7.725"/>

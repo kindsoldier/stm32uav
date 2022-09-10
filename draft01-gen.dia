@@ -1147,16 +1147,16 @@
     </dia:object>
     <dia:object type="Cybernetics - t-minus" version="1" id="O21">
       <dia:attribute name="obj_pos">
-        <dia:point val="58.15,-1.15"/>
+        <dia:point val="49.65,-1.85"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="58.1,-1.2;59,-0.3"/>
+        <dia:rectangle val="49.6,-1.9;50.5,-1"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="58.15,-1.15"/>
+        <dia:point val="49.65,-1.85"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="0.79999999999999749"/>
