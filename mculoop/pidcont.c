@@ -23,8 +23,7 @@ void pidcont_setup(pidcont_t* p, double kp, double ki, double kd) {
     p->kd = kd;
 }
 
-
-double pidcont_next(pidcont_t* p, double target, double actual, double dt) {
+double pidcont_apply(pidcont_t* p, double target, double actual, double dt) {
 
     double error  = 0.0;
     double deriv  = 0.0;

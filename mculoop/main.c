@@ -33,11 +33,6 @@
 const uint32_t g_systick_freq = 50 * 1000;
 uint32_t g_sys_tick_counter;
 
-//static void _delay(uint32_t n) {
-//    for (int i = 0; i < n * ; i++)
-//        __asm__("nop");
-//}
-
 static void clock_setup(void) {
     rcc_clock_setup_pll(&rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
     rcc_periph_clock_enable(RCC_GPIOA);
@@ -81,9 +76,6 @@ static void i2c_setup(uint32_t i2c, uint32_t gpioport, uint32_t gpiopins) {
 static void systick_setup(uint32_t systic_freq) {
     g_sys_tick_counter = 0;
 
-    //gpio_mode_setup(GPIOB, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO6);
-    //gpio_set_output_options(GPIOB, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO6);
-
     systick_set_frequency(systic_freq, rcc_ahb_frequency);
     systick_interrupt_enable();
     systick_counter_enable();
@@ -92,7 +84,6 @@ static void systick_setup(uint32_t systic_freq) {
 
 void sys_tick_handler(void) {
     g_sys_tick_counter++;
-    //gpio_toggle(GPIOB, GPIO6);
 }
 
 uint32_t sys_tick_counter(void) {
@@ -107,7 +98,6 @@ uint32_t sys_tick_counter(void) {
 #define PWM250 3999
 #define PWM300 3333
 #define PWM330 3030
-
 
 static void timer_init(uint32_t timer) {
 
@@ -154,29 +144,6 @@ static void timer_gpio_setup(uint32_t gpio_port, uint32_t gpio_af, uint32_t gpio
 }
 
 
-//typedef struct {
-//    double k;
-//    double l;
-//} lpf_t;
-
-
-//void lpf_init(lpf_t* lpf, double k) {
-//    lpf->k = k;
-//    lpf->l = 0;
-//}
-
-
-//double simplp (double *x, double *y, int M, double xm1) {
-//  int n;
-//  y[0] = x[0] + xm1;
-//  for (n = 1; n < M ; n++) {
-//    y[n] =  x[n]  + x[n-1];
-//  }
-//  return x[M-1];
-//}
-
-
-
 typedef struct {
     double start;
     double freq;
@@ -187,7 +154,7 @@ void systimer_init(systimer_t* timer, double freq, double start) {
     timer->freq = freq;
 }
 
-double systimer_next(systimer_t* timer, double timestamp) {
+double systimer_apply(systimer_t* timer, double timestamp) {
     double difftime = (timestamp - timer->start) / timer->freq;
     timer->start = timestamp;
     return difftime;
@@ -219,7 +186,6 @@ int main(void) {
     tc_setratio(timer, TIM_OC3, 50);
     tc_setratio(timer, TIM_OC4, 70);
 
-
     imu_t imu;
     imu_setup(&imu, I2C1, 0x68);
     imu_calibrate(&imu, 100);
@@ -230,6 +196,26 @@ int main(void) {
     quaternion_t q;
     quaternion_init(&q);
 
+    double ak = 50.0;
+    lpf3_t lpfax;
+    lpf3_t lpfay;
+    lpf3_t lpfaz;
+
+    lpf3_init(&lpfax, ak);
+    lpf3_init(&lpfay, ak);
+    lpf3_init(&lpfaz, ak);
+
+    lpf3_t lpfgx;
+    lpf3_t lpfgy;
+    lpf3_t lpfgz;
+
+    lpf3_init(&lpfgx, ak);
+    lpf3_init(&lpfgy, ak);
+    lpf3_init(&lpfgz, ak);
+
+    systimer_t systimer;
+    systimer_init(&systimer, (double)g_systick_freq, (double)g_sys_tick_counter);
+
     pidcont_t p;
     pidcont_init(&p);
 
@@ -238,39 +224,18 @@ int main(void) {
 
     pidcont_setup(&p, kp, ki, 0);
 
-    double ak = 50.0;
-    lpf_t lpfax;
-    lpf_t lpfay;
-    lpf_t lpfaz;
-
-    lpf_init(&lpfax, ak);
-    lpf_init(&lpfay, ak);
-    lpf_init(&lpfaz, ak);
-
-    lpf_t lpfgx;
-    lpf_t lpfgy;
-    lpf_t lpfgz;
-
-    lpf_init(&lpfgx, ak);
-    lpf_init(&lpfgy, ak);
-    lpf_init(&lpfgz, ak);
-
-    systimer_t systimer;
-    systimer_init(&systimer, (double)g_systick_freq, (double)g_sys_tick_counter);
-
-
     while (true) {
         imu_getvec(&imu, &mval);
 
-        double dt = systimer_next(&systimer, g_sys_tick_counter);
+        double dt = systimer_apply(&systimer, g_sys_tick_counter);
 
-        mval.ax = lpf_apply(&lpfax, mval.ax, dt);
-        mval.ay = lpf_apply(&lpfay, mval.ay, dt);
-        mval.az = lpf_apply(&lpfaz, mval.az, dt);
+        mval.ax = lpf3_apply(&lpfax, mval.ax, dt);
+        mval.ay = lpf3_apply(&lpfay, mval.ay, dt);
+        mval.az = lpf3_apply(&lpfaz, mval.az, dt);
 
-        mval.gx = lpf_apply(&lpfgx, mval.gx, dt);
-        mval.gy = lpf_apply(&lpfgy, mval.gy, dt);
-        mval.gz = lpf_apply(&lpfgz, mval.gz, dt);
+        mval.gx = lpf3_apply(&lpfgx, mval.gx, dt);
+        mval.gy = lpf3_apply(&lpfgy, mval.gy, dt);
+        mval.gz = lpf3_apply(&lpfgz, mval.gz, dt);
 
         madgwick(dt, &q, &mval);
 
@@ -292,12 +257,7 @@ int main(void) {
 
         printf("dt=%.6f %lu <-pitch=%8.3f  roll=%8.3f  yaw=%8.3f\r\n", dt, out1, a.y, a.x, a.z);
 
-        //double out = pidcont_next(&p, 0, a.pitch, dt);
+        //double out = pidcont_apply(&p, 0, a.pitch, dt);
         //printf("dt=%.6f pitch=%8.3f  out=%10.3f %10.6f \r\n", dt, a.pitch, out, p.integ);
-
-
-        //double b2 = 0.0;
-        //double K = 0.01;
-        //b2 = b2*(1 - K) + b*K;
     };
 }

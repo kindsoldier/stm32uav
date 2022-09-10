@@ -35,6 +35,8 @@ OBJS+= geometry.o
 OBJS+= madgwick.o
 OBJS+= i2cdev.o
 OBJS+= pidcont.o
+OBJS+= mixer.o
+
 
 main.elf: $(OBJS)
 	$(TARGET)-gcc $(^F) $(LDFLAGS) -o $@

@@ -20,6 +20,6 @@ typedef struct {
 
 void pidcont_init(pidcont_t* p);
 void pidcont_setup(pidcont_t* p, double kp, double ki, double kd);
-double pidcont_next(pidcont_t* p, double target, double actual, double dt);
+double pidcont_apply(pidcont_t* p, double target, double actual, double dt);
 
 #endif

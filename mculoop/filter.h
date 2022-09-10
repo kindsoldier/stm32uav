@@ -10,9 +10,20 @@ typedef struct {
     double x0;
     double x1;
     double rc;
-} lpf_t;
+} lpf2_t;
 
-void lpf_init(lpf_t *lpf, double freq);
-double lpf_apply(lpf_t *lpf, double x2, double dt);
+void lpf2_init(lpf2_t *lpf, double freq);
+double lpf2_apply(lpf2_t *lpf, double x, double dt);
+
+
+typedef struct {
+    double x1;
+    double x2;
+    double x3;
+    double rc;
+} lpf3_t;
+
+void lpf3_init(lpf3_t *lpf, double freq);
+double lpf3_apply(lpf3_t *lpf, double x, double dt);
 
 #endif
