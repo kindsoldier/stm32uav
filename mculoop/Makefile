@@ -36,6 +36,8 @@ OBJS+= madgwick.o
 OBJS+= i2cdev.o
 OBJS+= pidcont.o
 OBJS+= mixer.o
+OBJS+= filter.o
+OBJS+= misc.o
 
 
 main.elf: $(OBJS)

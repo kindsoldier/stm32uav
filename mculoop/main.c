@@ -26,6 +26,7 @@
 #include <madgwick.h>
 #include <pidcont.h>
 #include <filter.h>
+#include <mixer.h>
 #include <misc.h>
 
 
@@ -192,9 +193,6 @@ int main(void) {
 
     printf("start\r\n");
 
-    imuvec_t mval;
-    quaternion_t q;
-    quaternion_init(&q);
 
     double ak = 50.0;
     lpf3_t lpfax;
@@ -216,13 +214,36 @@ int main(void) {
     systimer_t systimer;
     systimer_init(&systimer, (double)g_systick_freq, (double)g_sys_tick_counter);
 
-    pidcont_t p;
-    pidcont_init(&p);
+    imuvec_t mval;
+    quaternion_t q;
+    quaternion_init(&q);
 
-    double kp = 0;
-    double ki = 4000.0;
+    eulerangle_t a;
 
-    pidcont_setup(&p, kp, ki, 0);
+    double outx = 0.0;
+    double outy = 0.0;
+
+    mixer_t mix;
+    mixer_init(&mix);
+
+    mixer_iset(&mix, 0, &(a.x));
+    mixer_iset(&mix, 1, &(a.y));
+
+    mixer_oset(&mix, 0, &outx);
+    mixer_oset(&mix, 1, &outy);
+
+    mixer_rset(&mix, 0, 0, 0,  0.7);
+    mixer_rset(&mix, 1, 1, 1,  0.7);
+    mixer_rset(&mix, 2, 0, 1,  -0.7);
+    mixer_rset(&mix, 3, 1, 0,  0.7);
+
+    //pidcont_t p;
+    //pidcont_init(&p);
+
+    //double kp = 0;
+    //double ki = 4000.0;
+
+    //pidcont_setup(&p, kp, ki, 0);
 
     while (true) {
         imu_getvec(&imu, &mval);
@@ -239,9 +260,12 @@ int main(void) {
 
         madgwick(dt, &q, &mval);
 
-        eulerangle_t a;
         quaternion_toeuler(&q, &a);
         eulerangle_todegress(&a);
+
+        mixer_apply(&mix);
+
+        printf("dt=%.6f outx=%8.3f  outy=%8.3f\r\n", dt, outx, outy);
 
         double pmin = -90.0;
         double pmax =  90.0;
@@ -249,13 +273,13 @@ int main(void) {
         double omin =  150.0;
         double omax =  850.0;
 
-        uint32_t out1 = (uint32_t)mapval(pmin, pmax, omin, omax, a.y, true);
-        uint32_t out2 = (uint32_t)mapval(pmin, pmax, omin, omax, a.y, false);
+        uint32_t out1 = (uint32_t)mapval(pmin, pmax, omin, omax, outx, true);
+        uint32_t out2 = (uint32_t)mapval(pmin, pmax, omin, omax, outy, false);
 
         tc_setratio(timer, TIM_OC1, out1);
         tc_setratio(timer, TIM_OC2, out2);
 
-        printf("dt=%.6f %lu <-pitch=%8.3f  roll=%8.3f  yaw=%8.3f\r\n", dt, out1, a.y, a.x, a.z);
+        //printf("dt=%.6f %lu <-pitch=%8.3f  roll=%8.3f  yaw=%8.3f\r\n", dt, out1, a.y, a.x, a.z);
 
         //double out = pidcont_apply(&p, 0, a.pitch, dt);
         //printf("dt=%.6f pitch=%8.3f  out=%10.3f %10.6f \r\n", dt, a.pitch, out, p.integ);
