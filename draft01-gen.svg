@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="25cm" height="49cm" viewBox="73 -38 500 979" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #c2cee4" x="157.6" y="-37" width="142.4" height="77"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="157.6" y="-37" width="142.4" height="77"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="228.8" y="6.35">
+      <tspan x="228.8" y="6.35">IMU DRV</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="296.4" y="36.4"/>
+  </g>
+  <g>
+    <rect style="fill: #ccede2" x="174.4" y="253.1" width="145.6" height="66.9"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="174.4" y="253.1" width="145.6" height="66.9"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="247.2" y="291.4">
+      <tspan x="247.2" y="291.4">CORRELATOR</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="316.4" y="316.4"/>
+  </g>
+  <g>
+    <rect style="fill: #ccede2" x="394.4" y="213.1" width="125.6" height="86.9"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="394.4" y="213.1" width="125.6" height="86.9"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="457.2" y="261.4">
+      <tspan x="457.2" y="261.4">AZIMUT CALC</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="516.4" y="296.4"/>
+  </g>
+  <g>
+    <rect style="fill: #c2cee4" x="420" y="80" width="124.2" height="71.1"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="420" y="80" width="124.2" height="71.1"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="482.1" y="120.4">
+      <tspan x="482.1" y="120.4">GPS DRV</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="540.6" y="147.5"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="228.8,40 228.8,73.05 124.64,73.05 124.64,96.3639 "/>
+    <polygon style="fill: #000000" points="124.64,103.864 119.64,93.8639 124.64,96.3639 129.64,93.8639 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="124.64,103.864 119.64,93.8639 124.64,96.3639 129.64,93.8639 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="394.4,256.55 357.2,256.55 357.2,286.55 329.736,286.55 "/>
+    <polygon style="fill: #000000" points="322.236,286.55 332.236,281.55 329.736,286.55 332.236,291.55 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="322.236,286.55 332.236,281.55 329.736,286.55 332.236,291.55 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="482.1,151.1 482.1,182.1 444.64,182.1 444.64,203.364 "/>
+    <polygon style="fill: #000000" points="444.64,210.864 439.64,200.864 444.64,203.364 449.64,200.864 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="444.64,210.864 439.64,200.864 444.64,203.364 449.64,200.864 "/>
+  </g>
+  <g>
+    <rect style="fill: #ccede2" x="140" y="400" width="132.6" height="74.9"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="140" y="400" width="132.6" height="74.9"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="206.3" y="442.3">
+      <tspan x="206.3" y="442.3">POS CONV</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="269" y="471.3"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="247.2,320 247.2,379.1 193.04,379.1 193.04,390.264 "/>
+    <polygon style="fill: #000000" points="193.04,397.764 188.04,387.764 193.04,390.264 198.04,387.764 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="193.04,397.764 188.04,387.764 193.04,390.264 198.04,387.764 "/>
+  </g>
+  <g>
+    <rect style="fill: #d8e5e5" x="218.4" y="551.85" width="141.6" height="68.15"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="218.4" y="551.85" width="141.6" height="68.15"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="289.2" y="590.775">
+      <tspan x="289.2" y="590.775">NAVIGATOR</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="356.4" y="616.4"/>
+  </g>
+  <g>
+    <rect style="fill: #ccede2" x="74.4" y="106.1" width="125.6" height="73.9"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="74.4" y="106.1" width="125.6" height="73.9"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="137.2" y="147.9">
+      <tspan x="137.2" y="147.9">LQ FILTER</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="196.4" y="176.4"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="137.2,180 137.2,216.55 232.64,216.55 232.64,243.364 "/>
+    <polygon style="fill: #000000" points="232.64,250.864 227.64,240.864 232.64,243.364 237.64,240.864 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="232.64,250.864 227.64,240.864 232.64,243.364 237.64,240.864 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="206.3,474.9 206.3,529.85 275.04,529.85 275.04,542.114 "/>
+    <polygon style="fill: #000000" points="275.04,549.614 270.04,539.614 275.04,542.114 280.04,539.614 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="275.04,549.614 270.04,539.614 275.04,542.114 280.04,539.614 "/>
+  </g>
+  <g>
+    <rect style="fill: #c2cee4" x="440" y="440" width="131.6" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="440" y="440" width="131.6" height="80"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="505.8" y="484.85">
+      <tspan x="505.8" y="484.85">RX DRV</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="568" y="516.4"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="440,480 400,480 400,585.925 369.736,585.925 "/>
+    <polygon style="fill: #000000" points="362.236,585.925 372.236,580.925 369.736,585.925 372.236,590.925 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="362.236,585.925 372.236,580.925 369.736,585.925 372.236,590.925 "/>
+  </g>
+  <g>
+    <rect style="fill: #ccede2" x="275.4" y="699.6" width="124.6" height="80.4"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="275.4" y="699.6" width="124.6" height="80.4"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="337.7" y="744.65">
+      <tspan x="337.7" y="744.65">OUT MIXER</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="396.4" y="776.4"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="289.2,620 289.2,659.8 325.24,659.8 325.24,689.864 "/>
+    <polygon style="fill: #000000" points="325.24,697.364 320.24,687.364 325.24,689.864 330.24,687.364 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="325.24,697.364 320.24,687.364 325.24,689.864 330.24,687.364 "/>
+  </g>
+  <g>
+    <rect style="fill: #dbe6eb" x="380" y="840" width="120" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="380" y="840" width="120" height="80"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="440" y="884.85">
+      <tspan x="440" y="884.85">SERVO DRV</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="496.4" y="916.4"/>
+  </g>
+  <g>
+    <rect style="fill: #dbe6eb" x="160" y="860" width="120" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="160" y="860" width="120" height="80"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="220" y="904.85">
+      <tspan x="220" y="904.85">MOTOR DRV</tspan>
+    </text>
+    <text font-size="9.59985" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="276.4" y="936.4"/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="358.467,780 358.467,810 428,810 428,830.264 "/>
+    <polygon style="fill: #000000" points="428,837.764 423,827.764 428,830.264 433,827.764 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="428,837.764 423,827.764 428,830.264 433,827.764 "/>
+  </g>
+  <g>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="316.933,780 316.933,820 208,820 208,850.264 "/>
+    <polygon style="fill: #000000" points="208,857.764 203,847.764 208,850.264 213,847.764 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="208,857.764 203,847.764 208,850.264 213,847.764 "/>
+  </g>
+</svg>
