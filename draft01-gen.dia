@@ -28,7 +28,7 @@
           <dia:boolean val="false"/>
         </dia:attribute>
         <dia:attribute name="scaling">
-          <dia:real val="0.37097543478012085"/>
+          <dia:real val="0.39350631833076477"/>
         </dia:attribute>
         <dia:attribute name="fitto">
           <dia:boolean val="true"/>
@@ -1147,16 +1147,16 @@
     </dia:object>
     <dia:object type="Cybernetics - t-minus" version="1" id="O21">
       <dia:attribute name="obj_pos">
-        <dia:point val="64.85,-2.5"/>
+        <dia:point val="58.15,-1.15"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="64.8,-2.55;65.7,-1.65"/>
+        <dia:rectangle val="58.1,-1.2;59,-0.3"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="64.85,-2.5"/>
+        <dia:point val="58.15,-1.15"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="0.79999999999999749"/>
@@ -1237,22 +1237,22 @@
     </dia:object>
     <dia:object type="Cybernetics - t-minus" version="1" id="O23">
       <dia:attribute name="obj_pos">
-        <dia:point val="4.735,37.92"/>
+        <dia:point val="4.775,35.7"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="4.685,37.87;5.6575,38.8425"/>
+        <dia:rectangle val="4.725,35.65;5.6175,36.5425"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="4.735,37.92"/>
+        <dia:point val="4.775,35.7"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="0.87250000000000183"/>
+        <dia:real val="0.79250000000000353"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="0.87250000000000183"/>
+        <dia:real val="0.79250000000000353"/>
       </dia:attribute>
       <dia:attribute name="line_width">
         <dia:real val="0.10000000000000001"/>

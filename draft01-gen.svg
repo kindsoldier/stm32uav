@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="62cm" height="42cm" viewBox="76 -51 1238 828" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="56cm" height="40cm" viewBox="76 -50 1104 781" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
     <rect style="fill: #c2cee4" x="154.6" y="-12" width="142.4" height="77"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="154.6" y="-12" width="142.4" height="77"/>
@@ -140,11 +140,11 @@
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="619,643.764 614,633.764 619,636.264 624,633.764 "/>
   </g>
   <g>
-    <ellipse style="fill: #ffffff" cx="1305" cy="-42" rx="8" ry="8"/>
-    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="1305" cy="-42" rx="8" ry="8"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1299.34,-36.3431 1305,-42 1310.66,-36.3431 "/>
-    <path style="fill: #000000" d="M 1299.34 -47.6569 C 1299.34,-47.6569 1301.42,-50 1305,-50 C 1308.58,-50 1310.66,-47.6569 1310.66,-47.6569 L 1305,-42 L 1299.34,-47.6569z"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 0.002; stroke: #000000" d="M 1299.34 -47.6569 C 1299.34,-47.6569 1301.42,-50 1305,-50 C 1308.58,-50 1310.66,-47.6569 1310.66,-47.6569 L 1305,-42 L 1299.34,-47.6569"/>
+    <ellipse style="fill: #ffffff" cx="1171" cy="-15" rx="8" ry="8"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="1171" cy="-15" rx="8" ry="8"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1165.34,-9.34312 1171,-15 1176.66,-9.34312 "/>
+    <path style="fill: #000000" d="M 1165.34 -20.6569 C 1165.34,-20.6569 1167.42,-23 1171,-23 C 1174.58,-23 1176.66,-20.6569 1176.66,-20.6569 L 1171,-15 L 1165.34,-20.6569z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 0.002; stroke: #000000" d="M 1165.34 -20.6569 C 1165.34,-20.6569 1167.42,-23 1171,-23 C 1174.58,-23 1176.66,-20.6569 1176.66,-20.6569 L 1171,-15 L 1165.34,-20.6569"/>
   </g>
   <g>
     <ellipse style="fill: #ffffff" cx="85.425" cy="-40.875" rx="7.725" ry="7.725"/>
@@ -154,10 +154,10 @@
     <path style="fill: none; fill-opacity:0; stroke-width: 0.002; stroke: #000000" d="M 79.9626 -46.3374 C 79.9626,-46.3374 81.964,-48.6 85.425,-48.6 C 88.886,-48.6 90.8874,-46.3374 90.8874,-46.3374 L 85.425,-40.875 L 79.9626,-46.3374"/>
   </g>
   <g>
-    <ellipse style="fill: #ffffff" cx="103.425" cy="767.125" rx="8.725" ry="8.725"/>
-    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="103.425" cy="767.125" rx="8.725" ry="8.725"/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="97.2555,773.295 103.425,767.125 109.595,773.295 "/>
-    <path style="fill: #000000" d="M 97.2555 760.955 C 97.2555,760.955 99.516,758.4 103.425,758.4 C 107.334,758.4 109.595,760.955 109.595,760.955 L 103.425,767.125 L 97.2555,760.955z"/>
-    <path style="fill: none; fill-opacity:0; stroke-width: 0.002; stroke: #000000" d="M 97.2555 760.955 C 97.2555,760.955 99.516,758.4 103.425,758.4 C 107.334,758.4 109.595,760.955 109.595,760.955 L 103.425,767.125 L 97.2555,760.955"/>
+    <ellipse style="fill: #ffffff" cx="103.425" cy="721.925" rx="7.925" ry="7.925"/>
+    <ellipse style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" cx="103.425" cy="721.925" rx="7.925" ry="7.925"/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="97.8212,727.529 103.425,721.925 109.029,727.529 "/>
+    <path style="fill: #000000" d="M 97.8212 716.321 C 97.8212,716.321 99.8744,714 103.425,714 C 106.976,714 109.029,716.321 109.029,716.321 L 103.425,721.925 L 97.8212,716.321z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 0.002; stroke: #000000" d="M 97.8212 716.321 C 97.8212,716.321 99.8744,714 103.425,714 C 106.976,714 109.029,716.321 109.029,716.321 L 103.425,721.925 L 97.8212,716.321"/>
   </g>
 </svg>
