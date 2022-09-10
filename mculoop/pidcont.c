@@ -31,13 +31,12 @@ double pidcont_next(pidcont_t* p, double target, double actual, double dt) {
     double integ  = 0.0;
     double output = 0.0;
 
-    const double kk = 100;
+    error = target - actual;
+    integ += error * dt;
 
-    error = (target - actual);
-    integ += (error * dt);
-    deriv = (error - p->perror) * dt;
+    deriv = error - p->perror;
 
-    output = (p->kp * error / kk) + (p->ki * integ / kk) + (p->kd * deriv / kk);
+    output = (p->kp * error) + (p->ki * integ) + (p->kd * deriv);
 
     p->perror = error;
     p->integ  = integ;
