@@ -10,8 +10,8 @@
 
 #include <ibus.h>
 
-#define IBUS_FRAMESIZE 32
-#define IBUS_CHANNELS  14
+#define STARTFR_BYTE 0x20
+#define COMMAND_BYTE 0x40
 
 void ibus_init(ibus_t* bus) {
     memset(bus->iframe, 0, sizeof(bus->iframe));
@@ -22,10 +22,10 @@ void ibus_init(ibus_t* bus) {
 
 bool ibus_recv(ibus_t* bus, uint8_t ibyte) {
 
-    if(bus->findex == 0 && ibyte != 0x20) {
+    if(bus->findex == 0 && ibyte != STARTFR_BYTE) {
         return false;
     }
-    if(bus->findex == 1 && ibyte != 0x40) {
+    if(bus->findex == 1 && ibyte != COMMAND_BYTE) {
         bus->findex = 0;
         return false;
     }
