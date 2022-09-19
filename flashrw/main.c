@@ -19,6 +19,7 @@
 #include <math.h>
 
 #include <usartu.h>
+#include <config.h>
 
 static void clock_setup(void) {
     rcc_clock_setup_pll(&rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
@@ -48,41 +49,22 @@ static void usart_setup(uint32_t usart, uint32_t gpioport, uint32_t gpiopins, ui
     usart_enable(usart);
 }
 
-#define SECTOR_NO 1
-extern uint8_t _config;
-
-
-typedef struct {
-    int32_t gz;
-    int32_t gy;
-} config_t;
-
-void config_init(config_t* c){
-    c->gz = 0x12;
-    c->gy = 0x17;
-};
 
 int main(void) {
 
     clock_setup();
     usart_setup(USART1, GPIOA, GPIO9 | GPIO10, 115200);
 
-    uint32_t caddr = 0xFFFFFFFF;
-    caddr = (uint32_t)&_config;
-    config_t* dconfig = (config_t*)caddr;
+    config_t rconfig;
+    config_init(&rconfig);
+    rconfig.gz = 0x15;
+    rconfig.gy = 0x19;
 
-    config_t tconfig;
-    config_init(&tconfig);
+    config_save(&rconfig);
 
-    flash_unlock();
-    flash_erase_sector(SECTOR_NO, sizeof(config_t));
+    config_t* sconfig = config_getptr();
 
-    printf("\r\n");
-    printf("gy = 0x%08lx \r\n", dconfig->gy);
-
-    flash_program(caddr, (uint8_t*)&tconfig, (uint32_t)sizeof(config_t));
-
-    printf("gy = 0x%08lx \r\n", dconfig->gy);
+    printf("gy = 0x%08lx \r\n", sconfig->gy);
 
     while (true) {
 

@@ -116,7 +116,7 @@ int _wait(int *status) {
 }
 
 #if 0
-void *xxx_sbrk(int incr) {
+void *_sbrk(int incr) {
 
     extern unsigned char *_end;
     static unsigned char *heap = NULL;
@@ -146,14 +146,8 @@ caddr_t __attribute__((weak)) _sbrk (int incr) {
     prev_heap_end = heap_end;
 
     if (heap_end + incr > stack_ptr) {
-#if 0
-       extern void abort (void);
-        _write (1, "_sbrk: Heap and stack collision\n", 32);
-       abort ();
-#else
        errno = ENOMEM;
        return (caddr_t) -1;
-#endif
      }
 
     heap_end += incr;

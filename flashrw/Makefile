@@ -30,6 +30,9 @@ all: main.bin
 OBJS+= main.o
 OBJS+= syscall.o
 OBJS+= usartu.o
+OBJS+= config.o
+
+
 
 
 main.elf: $(OBJS)
