@@ -161,8 +161,31 @@ double systimer_apply(systimer_t* timer, double timestamp) {
     return difftime;
 }
 
+typedef struct {
+    imu_t imu;
+    imuvec_t ival;
 
-int main(void) {
+    systimer_t systimer;
+    uint32_t timer;
+
+    lpf3_t lpfax;
+    lpf3_t lpfay;
+    lpf3_t lpfaz;
+
+    lpf3_t lpfgx;
+    lpf3_t lpfgy;
+    lpf3_t lpfgz;
+
+    quaternion_t q;
+    eulerangle_t a;
+
+    mixer_t mix;
+    double outx;
+    double outy;
+} uav_t;
+
+
+void uav_init(uav_t* uav) {
 
     clock_setup();
     usart_setup(USART1, GPIOA, GPIO9 | GPIO10, 460800);
@@ -175,97 +198,86 @@ int main(void) {
     timer_gpio_setup(GPIOA, GPIO_AF1, GPIO2);
     timer_gpio_setup(GPIOA, GPIO_AF1, GPIO3);
 
-    uint32_t timer = TIM2;
-    timer_init(timer);
-    tc_init(timer, TIM_OC1);
-    tc_init(timer, TIM_OC2);
-    tc_init(timer, TIM_OC3);
-    tc_init(timer, TIM_OC4);
+    uav->timer = TIM2;
+    timer_init(uav->timer);
 
-    tc_setratio(timer, TIM_OC1, 10);
-    tc_setratio(timer, TIM_OC2, 30);
-    tc_setratio(timer, TIM_OC3, 50);
-    tc_setratio(timer, TIM_OC4, 70);
+    tc_init(uav->timer, TIM_OC1);
+    tc_init(uav->timer, TIM_OC2);
+    tc_init(uav->timer, TIM_OC3);
+    tc_init(uav->timer, TIM_OC4);
 
-    imu_t imu;
-    imu_setup(&imu, I2C1, 0x68);
-    imu_calibrate(&imu, 100);
+    tc_setratio(uav->timer, TIM_OC1, 10);
+    tc_setratio(uav->timer, TIM_OC2, 30);
+    tc_setratio(uav->timer, TIM_OC3, 50);
+    tc_setratio(uav->timer, TIM_OC4, 70);
 
-    printf("start\r\n");
-
+    imu_setup(&(uav->imu), I2C1, 0x68);
+    imu_calibrate(&(uav->imu), 100);
 
     double ak = 50.0;
-    lpf3_t lpfax;
-    lpf3_t lpfay;
-    lpf3_t lpfaz;
 
-    lpf3_init(&lpfax, ak);
-    lpf3_init(&lpfay, ak);
-    lpf3_init(&lpfaz, ak);
+    lpf3_init(&(uav->lpfgx), ak);
+    lpf3_init(&(uav->lpfgy), ak);
+    lpf3_init(&(uav->lpfgz), ak);
 
-    lpf3_t lpfgx;
-    lpf3_t lpfgy;
-    lpf3_t lpfgz;
+    lpf3_init(&(uav->lpfax), ak);
+    lpf3_init(&(uav->lpfay), ak);
+    lpf3_init(&(uav->lpfaz), ak);
 
-    lpf3_init(&lpfgx, ak);
-    lpf3_init(&lpfgy, ak);
-    lpf3_init(&lpfgz, ak);
+    systimer_init(&(uav->systimer), (double)g_systick_freq, (double)g_sys_tick_counter);
 
-    systimer_t systimer;
-    systimer_init(&systimer, (double)g_systick_freq, (double)g_sys_tick_counter);
+    quaternion_init(&(uav->q));
 
-    imuvec_t mval;
-    quaternion_t q;
-    quaternion_init(&q);
+    mixer_init(&(uav->mix));
 
-    eulerangle_t a;
+    mixer_iset(&(uav->mix), 0, &(uav->a.x));
+    mixer_iset(&(uav->mix), 1, &(uav->a.y));
 
-    double outx = 0.0;
-    double outy = 0.0;
+    mixer_oset(&(uav->mix), 0, &(uav->outx));
+    mixer_oset(&(uav->mix), 1, &(uav->outy));
 
-    mixer_t mix;
-    mixer_init(&mix);
-
-    mixer_iset(&mix, 0, &(a.x));
-    mixer_iset(&mix, 1, &(a.y));
-
-    mixer_oset(&mix, 0, &outx);
-    mixer_oset(&mix, 1, &outy);
-
-    mixer_rset(&mix, 0, 0, 0,  0.7);
-    mixer_rset(&mix, 1, 1, 1,  0.7);
-    mixer_rset(&mix, 2, 0, 1,  -0.7);
-    mixer_rset(&mix, 3, 1, 0,  0.7);
+    mixer_rset(&(uav->mix), 0, 0, 0,  0.7);
+    mixer_rset(&(uav->mix), 1, 1, 1,  0.7);
+    mixer_rset(&(uav->mix), 2, 0, 1,  -0.7);
+    mixer_rset(&(uav->mix), 3, 1, 0,  0.7);
 
     //pidcont_t p;
     //pidcont_init(&p);
 
     //double kp = 0;
     //double ki = 4000.0;
-
     //pidcont_setup(&p, kp, ki, 0);
+}
+
+
+void uav_loop(uav_t* uav) {
 
     while (true) {
-        imu_getvec(&imu, &mval);
+        imu_getvec(&(uav->imu), &(uav->ival));
 
-        double dt = systimer_apply(&systimer, g_sys_tick_counter);
+        double dt = systimer_apply(&(uav->systimer), g_sys_tick_counter);
 
-        mval.ax = lpf3_apply(&lpfax, mval.ax, dt);
-        mval.ay = lpf3_apply(&lpfay, mval.ay, dt);
-        mval.az = lpf3_apply(&lpfaz, mval.az, dt);
+        //printf("%0.8f ival #1 = %10.5f %10.5f %10.5f\r\n", dt, uav->ival.gx, uav->ival.gy, uav->ival.gz);
 
-        mval.gx = lpf3_apply(&lpfgx, mval.gx, dt);
-        mval.gy = lpf3_apply(&lpfgy, mval.gy, dt);
-        mval.gz = lpf3_apply(&lpfgz, mval.gz, dt);
+        uav->ival.gx = lpf3_apply(&(uav->lpfgx), uav->ival.gx, dt);
+        uav->ival.gy = lpf3_apply(&(uav->lpfgy), uav->ival.gy, dt);
+        uav->ival.gz = lpf3_apply(&(uav->lpfgz), uav->ival.gz, dt);
 
-        madgwick(dt, &q, &mval);
+        uav->ival.ax = lpf3_apply(&(uav->lpfax), uav->ival.ax, dt);
+        uav->ival.ay = lpf3_apply(&(uav->lpfay), uav->ival.ay, dt);
+        uav->ival.az = lpf3_apply(&(uav->lpfaz), uav->ival.az, dt);
 
-        quaternion_toeuler(&q, &a);
-        eulerangle_todegress(&a);
+        //printf("%0.8f ival #2 = %10.5f %10.5f %10.5f\r\n", dt, uav->ival.gx, uav->ival.gy, uav->ival.gz);
 
-        mixer_apply(&mix);
+        madgwick(dt, &(uav->q), &(uav->ival));
+        quaternion_toeuler(&(uav->q), &(uav->a));
+        eulerangle_todegress(&(uav->a));
 
-        printf("dt=%.6f outx=%8.3f  outy=%8.3f\r\n", dt, outx, outy);
+        //printf("%.8f 0x%8.3f 0x%8.3f 0x%8.3f\r\n", dt, uav->a.x, uav->a.y, uav->a.z);
+
+        mixer_apply(&(uav->mix));
+
+        printf("dt=%.6f outx=%8.3f  outy=%8.3f\r\n", dt, uav->outx, uav->outy);
 
         double pmin = -90.0;
         double pmax =  90.0;
@@ -273,15 +285,23 @@ int main(void) {
         double omin =  150.0;
         double omax =  850.0;
 
-        uint32_t out1 = (uint32_t)mapval(pmin, pmax, omin, omax, outx, true);
-        uint32_t out2 = (uint32_t)mapval(pmin, pmax, omin, omax, outy, false);
+        uint32_t out1 = (uint32_t)mapval(pmin, pmax, omin, omax, uav->outx, true);
+        uint32_t out2 = (uint32_t)mapval(pmin, pmax, omin, omax, uav->outy, false);
 
-        tc_setratio(timer, TIM_OC1, out1);
-        tc_setratio(timer, TIM_OC2, out2);
+        tc_setratio(uav->timer, TIM_OC1, out1);
+        tc_setratio(uav->timer, TIM_OC2, out2);
 
         //printf("dt=%.6f %lu <-pitch=%8.3f  roll=%8.3f  yaw=%8.3f\r\n", dt, out1, a.y, a.x, a.z);
 
         //double out = pidcont_apply(&p, 0, a.pitch, dt);
         //printf("dt=%.6f pitch=%8.3f  out=%10.3f %10.6f \r\n", dt, a.pitch, out, p.integ);
     };
+}
+
+
+int main(void) {
+    uav_t uav;
+    uav_init(&uav);
+    uav_loop(&uav);
+    return 0;
 }

@@ -27,6 +27,9 @@ TARGET= arm-eabi
 
 all: main.bin
 
+flow:
+	cflow --tree --brief --no-number --omit-arguments *.c
+
 OBJS+= main.o
 OBJS+= syscall.o
 OBJS+= usartu.o
