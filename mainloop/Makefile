@@ -35,7 +35,6 @@ OBJS+= syscall.o
 OBJS+= usartu.o
 OBJS+= mpu6050.o
 OBJS+= geometry.o
-OBJS+= madgwick.o
 OBJS+= i2cdev.o
 OBJS+= pidcont.o
 OBJS+= mixer.o

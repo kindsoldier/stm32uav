@@ -23,7 +23,6 @@
 #include <usartu.h>
 #include <mpu6050.h>
 #include <geometry.h>
-#include <madgwick.h>
 #include <pidcont.h>
 #include <filter.h>
 #include <mixer.h>
@@ -257,8 +256,6 @@ void uav_loop(uav_t* uav) {
 
         double dt = systimer_apply(&(uav->systimer), g_sys_tick_counter);
 
-        //printf("%0.8f ival #1 = %10.5f %10.5f %10.5f\r\n", dt, uav->ival.gx, uav->ival.gy, uav->ival.gz);
-
         uav->ival.gx = lpf3_apply(&(uav->lpfgx), uav->ival.gx, dt);
         uav->ival.gy = lpf3_apply(&(uav->lpfgy), uav->ival.gy, dt);
         uav->ival.gz = lpf3_apply(&(uav->lpfgz), uav->ival.gz, dt);
@@ -267,13 +264,10 @@ void uav_loop(uav_t* uav) {
         uav->ival.ay = lpf3_apply(&(uav->lpfay), uav->ival.ay, dt);
         uav->ival.az = lpf3_apply(&(uav->lpfaz), uav->ival.az, dt);
 
-        //printf("%0.8f ival #2 = %10.5f %10.5f %10.5f\r\n", dt, uav->ival.gx, uav->ival.gy, uav->ival.gz);
-
-        madgwick(dt, &(uav->q), &(uav->ival));
+        quaternion_madgwick(&(uav->q), &(uav->ival), dt);
         quaternion_toeuler(&(uav->q), &(uav->a));
-        eulerangle_todegress(&(uav->a));
 
-        //printf("%.8f 0x%8.3f 0x%8.3f 0x%8.3f\r\n", dt, uav->a.x, uav->a.y, uav->a.z);
+        eulerangle_todegress(&(uav->a));
 
         mixer_apply(&(uav->mix));
 

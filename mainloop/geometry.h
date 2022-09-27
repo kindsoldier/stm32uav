@@ -37,4 +37,6 @@ void eulerangle_toradians(eulerangle_t* a);
 void quaternion_init(quaternion_t* q);
 void quaternion_toeuler(quaternion_t* q, eulerangle_t* a);
 
+void quaternion_madgwick(quaternion_t* q, imuvec_t* m, double dt);
+
 #endif
