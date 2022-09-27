@@ -1,6 +1,11 @@
-### A little code for experiments
 
 
-![](/draft02-gen.svg "Draft")
+## Drafts around UAV system, a little code for experiments
+ 
+UAV - unmanned aircraft velocity
 
-![](/stm32stand.jpg "Stand")
+
+
+![](/docs/draft02-gen.svg "Draft")
+
+![](/docs/stm32stand.jpg "Stand")

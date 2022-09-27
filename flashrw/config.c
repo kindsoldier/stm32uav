@@ -8,7 +8,6 @@
 #include <config.h>
 #include <stdint.h>
 
-
 void config_init(config_t* c) {
     c->gz = 0x00;
     c->gy = 0x00;
